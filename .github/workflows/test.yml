@@ -1,16 +1,17 @@
 name: 🧪 Test
-
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # ← FIX 1: Node.js 24
+
 jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-
     steps:
       # ── Checkout code ────────────────────────────────────────
       - name: 📥 Checkout Repository
@@ -34,9 +35,7 @@ jobs:
       - name: 🔍 Lint with Flake8
         run: |
           pip install flake8
-          # Stop build if syntax errors or undefined names
           flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Warnings only (exit-zero = don't fail on style issues)
           flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
 
       # ── Run tests with pytest ─────────────────────────────────
@@ -47,7 +46,7 @@ jobs:
 
       # ── Upload coverage report ───────────────────────────────
       - name: 📊 Upload Coverage Report
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5   # ← FIX 2: upgraded from v4
         if: always()
         with:
           file: ./coverage.xml
