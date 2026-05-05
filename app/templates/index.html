@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CI/CD Demo App</title>
+  <style>
+    body { font-family: monospace; background: #0d1117; color: #c9d1d9; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .container { text-align: center; padding: 40px; border: 1px solid #30363d; border-radius: 12px; background: #161b22; max-width: 500px; width: 90%; }
+    h1 { color: #58a6ff; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin: 4px; }
+    .green { background: #1a4731; color: #3fb950; border: 1px solid #3fb950; }
+    .blue  { background: #0d2d6b; color: #58a6ff; border: 1px solid #58a6ff; }
+    a { color: #58a6ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="font-size:48px">🚀</div>
+    <h1>CI/CD Demo App</h1>
+    <span class="badge green">● Healthy</span>
+    <span class="badge blue">v{{ version }}</span>
+    <span class="badge blue">{{ env }}</span>
+    <p style="color:#8b949e;font-size:13px">Deployed via GitHub Actions</p>
+    <p><a href="/health">/health</a> · <a href="/api/info">/api/info</a></p>
+  </div>
+</body>
+</html>
