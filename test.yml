@@ -1,0 +1,64 @@
+name: 🧪 Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout code ────────────────────────────────────────
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # ── Set up Python ────────────────────────────────────────
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: app/requirements.txt
+
+      # ── Install dependencies ─────────────────────────────────
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements.txt
+
+      # ── Lint with flake8 ─────────────────────────────────────
+      - name: 🔍 Lint with Flake8
+        run: |
+          pip install flake8
+          # Stop build if syntax errors or undefined names
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Warnings only (exit-zero = don't fail on style issues)
+          flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+
+      # ── Run tests with pytest ─────────────────────────────────
+      - name: 🧪 Run Tests with Pytest
+        run: |
+          pip install pytest pytest-flask pytest-cov
+          pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-report=xml
+
+      # ── Upload coverage report ───────────────────────────────
+      - name: 📊 Upload Coverage Report
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+      # ── Test Docker build ────────────────────────────────────
+      - name: 🐳 Test Docker Build
+        run: |
+          docker build -t cicd-demo:test .
+          docker run --rm -d -p 5000:5000 --name test-container cicd-demo:test
+          sleep 5
+          curl -f http://localhost:5000/health || exit 1
+          docker stop test-container
+          echo "✅ Docker build and health check passed!"
