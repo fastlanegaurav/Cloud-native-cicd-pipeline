@@ -57,40 +57,45 @@ jobs:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
       - name: 🚀 Deploy to EC2 via SSH
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: ${{ secrets.EC2_USER }}          # e.g. ubuntu or ec2-user
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          APP_VERSION: ${{ github.sha }}
-        run: |
-          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
-            echo "🔑 Logging in to Docker Hub..."
-            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+       env:
+    EC2_HOST: ${{ secrets.EC2_HOST }}
+    EC2_USER: ${{ secrets.EC2_USER }}
+    DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+    APP_VERSION: ${{ github.sha }}
+  run: |
+    ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST \
+      DOCKERHUB_TOKEN="$DOCKERHUB_TOKEN" \
+      DOCKERHUB_USERNAME="$DOCKERHUB_USERNAME" \
+      APP_VERSION="$APP_VERSION" \
+      bash << 'EOF'
+      echo "🔑 Logging in to Docker Hub..."
+      echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
-            echo "⬇️ Pulling latest image..."
-            docker pull $DOCKERHUB_USERNAME/cicd-demo:latest
+      echo "⬇️ Pulling latest image..."
+      docker pull $DOCKERHUB_USERNAME/cicd-demo:latest
 
-            echo "🛑 Stopping old container (if running)..."
-            docker stop cicd-demo || true
-            docker rm   cicd-demo || true
+      echo "🛑 Stopping old container (if running)..."
+      docker stop cicd-demo || true
+      docker rm   cicd-demo || true
 
-            echo "▶️ Starting new container..."
-            docker run -d \
-              --name cicd-demo \
-              --restart unless-stopped \
-              -p 80:5000 \
-              -e APP_ENV=production \
-              -e APP_VERSION=$APP_VERSION \
-              $DOCKERHUB_USERNAME/cicd-demo:latest
+      echo "▶️ Starting new container..."
+      docker run -d \
+        --name cicd-demo \
+        --restart unless-stopped \
+        -p 80:5000 \
+        -e APP_ENV=production \
+        -e APP_VERSION=$APP_VERSION \
+        $DOCKERHUB_USERNAME/cicd-demo:latest
 
-            echo "🧹 Cleaning up old images..."
-            docker image prune -f
+      echo "🧹 Cleaning up old images..."
+      docker image prune -f
 
-            echo "✅ Health check..."
-            sleep 5
-            curl -f http://localhost/health && echo "🎉 Deploy successful!"
-          EOF
+      echo "✅ Health check..."
+      sleep 5
+      curl -f http://localhost/health && echo "🎉 Deploy successful!"
+    EOF
+            
 
       # ── Post-deploy notification ─────────────────────────────
       - name: 📣 Notify on Success
