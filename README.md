@@ -19,7 +19,7 @@ This project demonstrates a modern DevOps workflow where every push to the `main
 
 The pipeline follows production-style CI/CD practices used in cloud-native engineering environments.
 
----
+--
 
 # 📐 Architecture Diagram
 
