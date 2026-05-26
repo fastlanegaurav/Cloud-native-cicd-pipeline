@@ -4,7 +4,7 @@ A fully automated CI/CD pipeline that builds, tests, and deploys a Python Flask 
 
 Designed to simulate real-world DevOps deployment workflows with automated testing, containerization, infrastructure deployment, and deployment health validation.
 
----
+--
 
 ## 🌐 Project Overview
 
