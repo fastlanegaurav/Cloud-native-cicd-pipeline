@@ -21,7 +21,7 @@ The pipeline follows production-style CI/CD practices used in cloud-native engin
 
 --
 
-# 📐 Architecture Diagram
+# #📐 Architecture Diagram
 
                 ┌─────────────────┐
                 │    Developer    │
