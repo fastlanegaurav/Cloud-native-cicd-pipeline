@@ -1,4 +1,4 @@
-# 🚀 Production-Ready CI/CD Pipeline
+## 🚀 Production-Ready CI/CD Pipeline
 
 A fully automated CI/CD pipeline that builds, tests, and deploys a Python Flask application to AWS EC2 using GitHub Actions, Docker, and Docker Hub.
 
